@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@600&display=swap">
+<title>Agenda & Finanças</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+color-scheme:light;--bg:#faf6fc;--card:#fff;--text:#2a2233;--muted:#7a7186;--line:#d6c2e4;--accent:#8e4ec6;--accent-t:#fff;--accent2:#e0629f;--grad:linear-gradient(135deg,#8e4ec6,#d65fa5);--shadow:0 6px 20px rgba(142,78,198,.12);
+--note:#ffe066;--note-t:#3a2f00;--danger:#c0392b;--ok:#1f8a5b;--warn:#b8610a;--red:#e5484d}
+@media (prefers-color-scheme:dark) and (min-width:99999px){:root:not([data-theme="light"]){color-scheme:dark;--bg:#17181a;--card:#222426;--text:#efeee9;--muted:#a09b90;--line:#383a3d;--accent:#6fb59f;--accent-t:#10201b;--note:#f2cc3a;--note-t:#2b2300;--danger:#f2b8b5;--ok:#7fd6a0;--warn:#f0b56a}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#17181a;--card:#222426;--text:#efeee9;--muted:#a09b90;--line:#383a3d;--accent:#6fb59f;--accent-t:#10201b;--note:#f2cc3a;--note-t:#2b2300;--danger:#f2b8b5;--ok:#7fd6a0;--warn:#f0b56a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(700px 320px at 50% -80px,#f1defa,transparent 70%) no-repeat,var(--bg);color:var(--text);font:16px/1.5 "DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:20px 16px 270px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.7rem;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:1.05rem;margin:26px 0 12px;color:var(--accent)}
+h3{font-size:.95rem;margin:20px 0 8px}
+.muted{color:var(--muted);font-size:.9rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+label{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 4px}
+input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);font:inherit}
+input:focus{outline:2px solid var(--accent2);border-color:transparent}
+button{font:inherit;cursor:pointer;border-radius:10px;border:0;padding:12px 16px}
+.primary{background:var(--grad);color:var(--accent-t);width:100%;margin-top:18px;font-weight:700;box-shadow:0 6px 16px rgba(142,78,198,.3)}
+.link{background:none;color:var(--accent);width:100%;margin-top:8px;border:1px solid var(--line)}
+.err{color:var(--danger);font-size:.9rem;min-height:1.2em;margin-top:10px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:var(--grad);color:#fff;border-radius:24px;padding:20px 18px;box-shadow:var(--shadow)}
+.top .muted{color:#fff;opacity:.85}
+#h-date{text-transform:capitalize}
+.top .out{background:rgba(255,255,255,.22);border:0;color:#fff;padding:8px 14px;font-size:.85rem}
+.note{--c:var(--note);background:color-mix(in srgb,var(--c) 28%,transparent);border:1px solid var(--c);border-left:6px solid var(--c);color:var(--text);cursor:pointer;border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.note.pe{--c:var(--red)}
+.note .time{font-family:Fraunces,Georgia,serif;font-size:1.3rem;font-weight:600;min-width:62px}
+.note .info{flex:1}
+.note .info b{display:block}
+.note .x{background:none;color:var(--text);padding:2px 6px;font-size:1.1rem;opacity:.7}
+.badge{display:inline-block;font-size:.75rem;font-weight:700;margin-top:4px;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--c) 45%,transparent)}
+.mini{background:var(--c);color:#111;padding:6px 10px;font-size:.8rem;margin-top:6px}
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-h button{background:var(--bg);border:1px solid var(--line);color:var(--text);padding:6px 12px}
+.cal-h b{text-transform:capitalize;font-family:Fraunces,Georgia,serif;font-size:1.1rem}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.grid i{font-style:normal;padding:9px 0;border-radius:8px;font-size:.9rem}
+.grid .dow{color:var(--muted);font-size:.75rem;padding:2px 0}
+.grid .busy{background:color-mix(in srgb,var(--note) 55%,transparent);box-shadow:inset 0 0 0 1px var(--note);color:var(--text);font-weight:700}
+.grid .today{outline:2px solid var(--accent2)}
+.fabs{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;z-index:5}
+.fab{width:56px;height:56px;border-radius:50%;padding:0;font-size:1.4rem;font-weight:700;background:var(--grad);color:var(--accent-t);box-shadow:0 6px 16px rgba(142,78,198,.4)}
+.fab.s{width:48px;height:48px;align-self:center;font-size:1.1rem;background:var(--card);color:var(--text);border:1px solid var(--line)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:520px;max-height:92%;overflow-y:auto;border-radius:26px 26px 0 0;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.sheet .hd{display:flex;justify-content:space-between;align-items:center}
+.sheet .hd button{background:none;color:var(--text);font-size:1.2rem;padding:4px 8px}
+.pick{position:relative}
+.list{border:1px solid var(--line);border-radius:10px;background:var(--card);margin-top:4px;max-height:160px;overflow-y:auto}
+.list div{padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.list div:last-child{border:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item button{background:none;color:var(--muted);padding:4px 8px}
+.item .ok{color:var(--ok);font-weight:700}
+.item .re{background:var(--accent);color:var(--accent-t);font-size:.8rem}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.box{--c:var(--accent);background:color-mix(in srgb,var(--c) 8%,var(--card));border:2px solid color-mix(in srgb,var(--c) 60%,transparent);border-radius:16px;box-shadow:var(--shadow);padding:10px 8px;text-align:center}
+.box span{display:block;font-size:.75rem;color:var(--muted)}
+.box b{font-size:1rem}
+.in b{color:var(--ok)}.pe b{color:var(--warn)}.de b{color:var(--danger)}
+.box.in{--c:var(--ok)}.box.pe{--c:var(--warn)}.box.de{--c:var(--danger)}
+.big{--c:var(--note);background:color-mix(in srgb,var(--c) 30%,var(--card));border:2px solid var(--c);color:var(--text);border-radius:18px;padding:22px 18px;width:calc(100% - 32px);max-width:420px;align-self:center;margin-bottom:auto;margin-top:auto}
+.big .time{font-size:2.2rem;font-weight:800}
+.big .n{font-size:1.3rem;font-weight:700}
+.big .acts{display:grid;gap:8px;margin-top:18px}
+.big .acts button{font-weight:700;padding:14px}
+.b-ok{background:var(--ok);color:#fff}.b-pe{background:var(--warn);color:#fff}.b-ca{background:var(--danger);color:#fff}
+@media (prefers-color-scheme:dark) and (min-width:99999px){.b-ca{color:#2b0b09}.b-ok{color:#06210f}.b-pe{color:#2b1800}}
+.later{background:none;color:var(--text);text-decoration:underline;margin-top:6px;width:100%}
+.big.pe{--c:var(--red)}
+.box[data-go]{cursor:pointer}
+#f-hist,#f-pend,#f-exp,#k-list,#p-items,#d-list{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:2px 14px}
+#f-hist .item:last-child,#f-pend .item:last-child,#f-exp .item:last-child,#k-list .item:last-child,#p-items .item:last-child,#d-list .item:last-child{border-bottom:0}
+.grid i[data-d]{cursor:pointer}
+.fab.pill{position:sticky;bottom:8px;display:block;margin:18px 0 0 auto;width:auto;height:auto;border-radius:99px;padding:12px 18px;font-size:1rem}
+.warn{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(500px,calc(100% - 24px));background:var(--card);border:2px solid var(--danger);border-radius:16px;padding:12px 14px;z-index:30;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.warn div{display:flex;gap:8px;flex-wrap:wrap}
+.warn button{padding:8px 12px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+[hidden]{display:none!important}
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#8e4ec6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Agenda">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}body{overscroll-behavior-y:none;-webkit-touch-callout:none}input,textarea{-webkit-touch-callout:default}</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="login" hidden>
+  <div style="font-size:2.6rem;margin-top:24px">🌸</div><h1>Agenda & Finanças</h1>
+  <p class="muted">Entre com sua conta Google. Seus dados ficam salvos no seu Google Drive.</p>
+  <div class="panel">
+    <button class="primary" id="btn-google" style="margin-top:0">Entrar com Google</button>
+    <div class="err" id="l-err"></div>
+    <p class="muted" style="margin:0">No primeiro acesso o cadastro é criado automaticamente, com o e-mail da conta Google.</p>
+  </div>
+</section>
+
+<section id="register" hidden></section>
+
+<section id="home" hidden>
+  <div class="top">
+    <div><h1 id="h-name">Olá</h1><div class="muted" id="h-date"></div><div class="muted" id="sync" style="font-size:.8rem"></div></div>
+    <button class="out" id="btn-out">Sair</button>
+  </div>
+  <h2>🔔 Notificações do dia</h2>
+  <div id="notes"></div>
+  <h2>Calendário</h2>
+  <div class="panel">
+    <div class="cal-h"><button id="c-prev" aria-label="Mês anterior">‹</button><b id="c-title"></b><button id="c-next" aria-label="Próximo mês">›</button></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+</div>
+
+<div class="warn" id="warn" hidden><span id="warn-msg"></span><div><button id="warn-clean" hidden>Apagar por data</button><button id="warn-retry">Tentar de novo</button><button id="warn-x">Fechar</button></div></div>
+
+<div class="fabs" id="fabs" hidden>
+  <button class="fab s" id="fab-cli" aria-label="Clientes">👥</button>
+  <button class="fab s" id="fab-est" aria-label="Estoque">📦</button>
+  <button class="fab s" id="fab-fin" aria-label="Financeiro">R$</button>
+  <button class="fab" id="fab-add" aria-label="Novo agendamento">+</button>
+</div>
+
+<div class="ov" id="ov" hidden>
+  <div class="sheet" id="m-add" hidden>
+    <div class="hd"><h1>Novo agendamento</h1><button data-close aria-label="Fechar">✕</button></div>
+    <label for="a-client">Cliente</label>
+    <div class="pick"><input id="a-client" placeholder="Toque para escolher" autocomplete="off"><div class="list" id="a-list" hidden></div></div>
+    <label for="a-proc">Procedimento</label><input id="a-proc">
+    <div class="row"><div><label for="a-date">Data</label><input id="a-date" type="date"></div><div><label for="a-time">Horário</label><input id="a-time" type="time"></div></div>
+    <label for="a-val">Valor (R$)</label><input id="a-val" type="number" step="0.01" min="0" inputmode="decimal">
+    <div class="err" id="a-err"></div>
+    <button class="primary" id="btn-add">Agendar</button>
+  </div>
+
+  <div class="sheet" id="m-cli" hidden>
+    <div class="hd"><h1>Clientes</h1><button data-close aria-label="Fechar">✕</button></div>
+    <label for="k-name">Nome</label><input id="k-name">
+    <label for="k-tel">Telefone</label><input id="k-tel" type="tel" inputmode="tel">
+    <div class="err" id="k-err"></div>
+    <button class="primary" id="btn-cli">Cadastrar cliente</button>
+    <h3>Clientes cadastrados</h3><div id="k-list"></div>
+  </div>
+
+  <div class="sheet" id="m-fin" hidden>
+    <div class="hd"><h1>Financeiro</h1><button data-close aria-label="Fechar">✕</button></div>
+    <div class="sum">
+      <div class="box in"><span>Entrou</span><b id="f-in"></b></div>
+      <div class="box pe" data-go="m-pend"><span>Pendente ›</span><b id="f-pe"></b></div>
+      <div class="box de" data-go="m-exp"><span>Despesas ›</span><b id="f-de"></b></div>
+    </div>
+    <div class="muted" id="f-bal" style="margin-top:10px;text-align:center"></div>
+    <div class="muted" style="text-align:center;font-size:.8rem">Toque em Pendente ou Despesas para ver a lista</div>
+    <h3>Histórico de pagamentos recebidos</h3><div id="f-hist"></div>
+    
+    <button class="fab pill" id="fab-exp">− Despesas</button>
+  </div>
+
+  <div class="sheet" id="m-exp" hidden>
+    <div class="hd"><h1>Despesas</h1><button id="exp-back" aria-label="Voltar">✕</button></div>
+    <div class="row" style="margin-top:14px"><input id="e-desc" placeholder="Descrição"><input id="e-val" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Valor"></div>
+    <button class="link" id="btn-exp">Adicionar despesa</button>
+    <div id="f-exp"></div>
+  </div>
+
+  <div class="sheet" id="m-est" hidden>
+    <div class="hd"><h1>Estoque</h1><button data-close aria-label="Fechar">✕</button></div>
+    <label for="s-name">Produto</label>
+    <div class="pick"><input id="s-name" placeholder="Digite para buscar na lista" autocomplete="off"><div class="list" id="s-list" hidden></div></div>
+    <div class="row"><div><label for="s-val">Valor unitário (R$)</label><input id="s-val" type="number" step="0.01" min="0" inputmode="decimal"></div><div><label for="s-qty">Quantidade</label><input id="s-qty" type="number" min="1" step="1" inputmode="numeric"></div></div>
+    <div class="err" id="s-err"></div>
+    <button class="primary" id="btn-est" style="margin-top:6px">Adicionar ao estoque</button>
+    <div id="s-items"></div>
+    <button class="fab pill" id="fab-prod">+ Lista de produtos</button>
+  </div>
+
+  <div class="sheet" id="m-prod" hidden>
+    <div class="hd"><h1>Lista de produtos</h1><button id="prod-back" aria-label="Voltar">✕</button></div>
+    <div class="row" style="margin-top:14px"><input id="p-name" placeholder="Nome do produto"><input id="p-val" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Valor (opcional)"></div>
+    <button class="link" id="btn-prod">Adicionar à lista</button>
+    <div id="p-items"></div>
+  </div>
+
+  <div class="sheet" id="m-pend" hidden>
+    <div class="hd"><h1>Pagamentos pendentes</h1><button id="pend-back" aria-label="Voltar">✕</button></div>
+    <p class="muted" id="pend-total"></p>
+    <div id="f-pend"></div>
+  </div>
+
+  <div class="sheet" id="m-clean" hidden>
+    <div class="hd"><h1>Apagar por data</h1><button data-close aria-label="Fechar">✕</button></div>
+    <p class="muted" style="margin-top:10px">Escolha até que data apagar. Os registros mais antigos saem do app e do Drive. Isso também remove esses pagamentos do histórico financeiro.</p>
+    <label for="c-date">Apagar registros até (inclusive)</label><input id="c-date" type="date">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" id="c-apps" checked style="width:auto;padding:0"> Agendamentos</label>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="c-exp" checked style="width:auto;padding:0"> Despesas</label>
+    <div id="c-count" class="muted" style="margin-top:10px"></div>
+    <button class="link" id="btn-backup">Baixar backup antes de apagar</button>
+    <button class="primary" id="btn-clean" style="margin-top:10px">Apagar</button>
+    <p class="muted" style="margin-top:14px">O app usa poucos KB. Para liberar espaço de verdade, apague arquivos grandes no Drive. <a href="https://drive.google.com/drive/quota" target="_blank" rel="noopener">Ver armazenamento</a></p>
+  </div>
+
+  <div class="sheet" id="m-day" hidden>
+    <div class="hd"><h1 id="d-title"></h1><button data-close aria-label="Fechar">✕</button></div>
+    <div id="d-list" style="margin-top:10px"></div>
+    <button class="primary" id="btn-dayadd">+ Agendar neste dia</button>
+  </div>
+
+  <div class="big" id="alert" hidden>
+    <div class="muted" style="color:inherit">🔔 Horário chegou</div>
+    <div class="time" id="al-time"></div>
+    <div class="n" id="al-client"></div>
+    <div id="al-info"></div>
+    <div class="acts">
+      <button class="b-ok" data-st="pago">Pagamento realizado</button>
+      <button class="b-pe" data-st="pendente">Pagamento pendente</button>
+      <button class="b-ca" data-st="cancelado">Cancelar horário</button>
+    </div>
+    <button class="later" id="al-later">Decidir depois</button>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const mem={};
+const store={get(k){return mem[k]??null},set(k,v){mem[k]=v;if(DATA_KEYS.some(p=>k.startsWith(p)))queueSave()}};
+
+/* ===== Google Drive ===== */
+const CLIENT_ID="COLE_AQUI_SEU_CLIENT_ID.apps.googleusercontent.com";
+const SCOPES="https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
+const FILE_NAME="agenda-financas.json";
+const DATA_KEYS=["ag_apps_","ag_cli_","ag_exp_","ag_est_","ag_prod_"];
+let token=null,tokenExp=0,tokenClient=null,fileId=null,saveTimer=null,saving=false,pending=false,ready=false,profile={name:""};
+const setSync=t=>{const e=$("sync");if(e)e.textContent=t};
+function initGoogle(){
+  if(!window.google||!google.accounts)return setTimeout(initGoogle,300);
+  tokenClient=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPES,callback:()=>{}});
+}
+function getToken(){
+  if(token&&Date.now()<tokenExp-60000)return Promise.resolve(token);
+  return new Promise((res,rej)=>{
+    tokenClient.callback=r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;tokenExp=Date.now()+r.expires_in*1000;res(token)};
+    tokenClient.requestAccessToken({prompt:token?"":"select_account"});
+  });
+}
+async function gapi(url,opt={}){
+  const t=await getToken();
+  const r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:"Bearer "+t}});
+  if(!r.ok){let j={};try{j=await r.json()}catch(e){}const reason=j.error&&j.error.errors&&j.error.errors[0]&&j.error.errors[0].reason;const err=new Error(reason||("http_"+r.status));err.reason=reason;throw err}
+  return r;
+}
+const bundle=()=>({v:1,name:profile.name,apps:load(KA(),[]),cli:load(KC(),[]),exp:load(KE(),[]),est:load(KS(),[]),prod:load(KP(),[])});
+function applyBundle(b){ready=false;profile.name=b.name||"";save(KA(),b.apps||[]);save(KC(),b.cli||[]);save(KE(),b.exp||[]);save(KS(),b.est||[]);save(KP(),b.prod||[])}
+async function driveLoad(){
+  setSync("☁️ Carregando do Drive…");
+  const q=encodeURIComponent("name='"+FILE_NAME+"' and trashed=false");
+  const r=await (await gapi("https://www.googleapis.com/drive/v3/files?q="+q+"&fields=files(id)&spaces=drive")).json();
+  if(r.files&&r.files.length){fileId=r.files[0].id;applyBundle(await (await gapi("https://www.googleapis.com/drive/v3/files/"+fileId+"?alt=media")).json());return true}
+  return false;
+}
+function queueSave(){if(!ready)return;pending=true;setSync("☁️ Alterações pendentes…");clearTimeout(saveTimer);saveTimer=setTimeout(driveSave,1500)}
+async function driveSave(){
+  clearTimeout(saveTimer);
+  if(!ready)return;
+  if(saving){pending=true;return}
+  saving=true;pending=false;let failed=false;setSync("☁️ Salvando…");
+  try{
+    const body=JSON.stringify(bundle());
+    if(fileId){await gapi("https://www.googleapis.com/upload/drive/v3/files/"+fileId+"?uploadType=media",{method:"PATCH",headers:{"Content-Type":"application/json"},body})}
+    else{
+      const bd="x"+Date.now();
+      const mp="--"+bd+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify({name:FILE_NAME,mimeType:"application/json"})+"\r\n--"+bd+"\r\nContent-Type: application/json\r\n\r\n"+body+"\r\n--"+bd+"--";
+      fileId=(await (await gapi("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{"Content-Type":"multipart/related; boundary="+bd},body:mp})).json()).id;
+    }
+    setSync("☁️ Salvo no Drive");hideWarn();checkQuota();
+  }catch(e){
+    failed=true;setSync("⚠️ Não salvo");
+    if(e.reason==="storageQuotaExceeded")showWarn("quota","O Drive está sem espaço. Suas alterações ainda não foram salvas.");
+    else showWarn("err","Não foi possível salvar no Drive ("+e.message+").");
+  }finally{saving=false;if(pending&&!failed)driveSave()}
+}
+async function checkQuota(){
+  try{
+    const q=(await (await gapi("https://www.googleapis.com/drive/v3/about?fields=storageQuota")).json()).storageQuota;
+    if(q&&q.limit){const p=Number(q.usage)/Number(q.limit);if(p>=0.98)showWarn("quota","O espaço do seu Drive está quase cheio ("+Math.round(p*100)+"% usado).")}
+  }catch(e){}
+}
+function showWarn(kind,msg){$("warn-msg").textContent=msg;$("warn-clean").hidden=kind!=="quota";$("warn").hidden=false}
+function hideWarn(){$("warn").hidden=true}
+$("warn-x").onclick=hideWarn;
+$("warn-retry").onclick=()=>{hideWarn();driveSave()};
+$("warn-clean").onclick=()=>{hideWarn();$("c-date").value="";cleanCount();openM("m-clean")};
+
+/* limpeza por data */
+function cleanCount(){
+  const d=$("c-date").value;
+  const a=$("c-apps").checked&&d?apps().filter(x=>x.date<=d).length:0;
+  const e=$("c-exp").checked&&d?load(KE(),[]).filter(x=>x.date<=d).length:0;
+  $("c-count").textContent=d?"Serão apagados: "+a+" agendamento(s) e "+e+" despesa(s).":"Escolha uma data.";
+  return [a,e];
+}
+["c-date","c-apps","c-exp"].forEach(i=>{$(i).addEventListener("input",cleanCount);$(i).addEventListener("change",cleanCount)});
+$("btn-backup").onclick=()=>{const b=new Blob([JSON.stringify(bundle(),null,1)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="backup-agenda-"+today()+".json";a.click()};
+$("btn-clean").onclick=()=>{
+  const d=$("c-date").value;if(!d)return;
+  const [a,e]=cleanCount();if(!a&&!e)return;
+  if(!confirm("Apagar "+a+" agendamento(s) e "+e+" despesa(s) até "+br(d)+"? Isso não pode ser desfeito."))return;
+  if($("c-apps").checked)save(KA(),load(KA(),[]).filter(x=>x.date>d));
+  if($("c-exp").checked)save(KE(),load(KE(),[]).filter(x=>x.date>d));
+  render();closeAll();driveSave();
+};
+const load=(k,d)=>{try{return JSON.parse(store.get(k))??d}catch(e){return d}};
+const save=(k,v)=>store.set(k,JSON.stringify(v));
+async function hash(s){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return "p:"+s}}
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>ymd(new Date());
+const br=s=>s.split("-").reverse().join("/");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const brl=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const sum=l=>l.reduce((s,a)=>s+(a.value||0),0);
+
+let user=null,cur=new Date(),curAlert=null;const seen=new Set();
+const KA=()=>"ag_apps_"+user.email,KC=()=>"ag_cli_"+user.email,KE=()=>"ag_exp_"+user.email,KS=()=>"ag_est_"+user.email,KP=()=>"ag_prod_"+user.email;
+const apps=()=>load(KA(),[]).map(a=>({...a,status:a.status||"agendado"}));
+const clients=()=>load(KC(),[]);
+function show(id){["login","register","home"].forEach(s=>$(s).hidden=s!==id);$("fabs").hidden=id!=="home"}
+
+function render(){
+  $("h-name").textContent="Olá, "+user.name;
+  $("h-date").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"});
+  const list=apps().filter(a=>a.date===today()&&a.status!=="cancelado"&&a.status!=="pago").sort((a,b)=>a.time.localeCompare(b.time));
+  $("notes").innerHTML=list.length?list.map(a=>{
+    const b=a.status==="pago"?"✓ Pago":a.status==="pendente"?"Pagamento pendente":"";
+    return `<div class="note${a.status==="pendente"?" pe":""}" data-open="${a.id}"><div class="time">${esc(a.time)}</div><div class="info"><b>${esc(a.client)}</b>${esc(a.proc)}${a.value?" · "+brl(a.value):""}${b?`<br><span class="badge">${b}</span>`:""}${a.status==="pendente"?`<br><button class="mini" data-st="pago" data-id="${a.id}">Marcar como pago</button>`:""}</div><button class="x" data-st="cancelado" data-id="${a.id}" aria-label="Cancelar">✕</button></div>`}).join(""):`<p class="muted">Nenhum agendamento para hoje.</p>`;
+  cal();
+}
+
+function cal(){
+  const y=cur.getFullYear(),m=cur.getMonth();
+  $("c-title").textContent=cur.toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  const busy=new Set(apps().filter(a=>a.status!=="cancelado").map(a=>a.date));
+  let h=["D","S","T","Q","Q","S","S"].map(d=>`<i class="dow">${d}</i>`).join("");
+  for(let i=0;i<new Date(y,m,1).getDay();i++)h+="<i></i>";
+  for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const ds=y+"-"+pad(m+1)+"-"+pad(d);h+=`<i data-d="${ds}" class="${busy.has(ds)?"busy ":""}${ds===today()?"today":""}">${d}</i>`}
+  $("grid").innerHTML=h;
+}
+$("c-prev").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);cal()};
+$("c-next").onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);cal()};
+
+function enter(u){user=u;cur=new Date();render();show("home");check()}
+$("btn-google").onclick=async()=>{
+  $("l-err").textContent="";
+  if(CLIENT_ID.startsWith("COLE_AQUI")){$("l-err").textContent="Configure o Client ID do Google no início do script (veja as instruções).";return}
+  if(!tokenClient){$("l-err").textContent="O Google ainda está carregando. Tente de novo.";return}
+  try{
+    await getToken();
+    const u=await (await gapi("https://www.googleapis.com/oauth2/v3/userinfo")).json();
+    user={name:u.given_name||u.name||"",email:String(u.email).toLowerCase()};
+    const found=await driveLoad();
+    if(!found||!profile.name){const n=prompt("Como você quer ser chamado(a)?",user.name);profile.name=(n&&n.trim())||user.name||"Você"}
+    user.name=profile.name;ready=true;
+    await driveSave();
+    enter(user);
+  }catch(e){ready=false;$("l-err").textContent="Não foi possível entrar: "+e.message}
+};
+$("btn-out").onclick=()=>{token=null;tokenExp=0;ready=false;fileId=null;profile={name:""};for(const k in mem)delete mem[k];user=null;closeAll();hideWarn();show("login")};
+
+/* modais */
+const MODALS=["m-add","m-cli","m-fin","m-exp","m-est","m-prod","m-pend","m-day","m-clean"];
+function openM(id){$("ov").hidden=false;MODALS.forEach(m=>$(m).hidden=m!==id);$("alert").hidden=true}
+function closeAll(){$("ov").hidden=true;MODALS.forEach(m=>$(m).hidden=true);$("alert").hidden=true;check()}
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeAll);
+$("ov").onclick=e=>{if(e.target===$("ov")&&$("alert").hidden)closeAll()};
+
+/* agendamento */
+let selId=null;
+$("fab-add").onclick=()=>{selId=null;["a-client","a-proc","a-time","a-val"].forEach(i=>$(i).value="");$("a-date").value=today();$("a-err").textContent="";$("a-list").hidden=true;openM("m-add")};
+function pickList(){
+  const q=$("a-client").value.trim().toLowerCase(),cs=clients().filter(c=>c.name.toLowerCase().includes(q));
+  $("a-list").innerHTML=clients().length?(cs.length?cs.map(c=>`<div data-id="${c.id}">${esc(c.name)} <span class="muted">${esc(c.phone)}</span></div>`).join(""):`<div class="muted">Nenhum cliente encontrado</div>`):`<div class="muted">Nenhum cliente cadastrado. Use o botão 👥.</div>`;
+  $("a-list").hidden=false;
+}
+$("a-client").onfocus=pickList;
+$("a-client").oninput=()=>{selId=null;pickList()};
+$("a-list").onclick=e=>{const d=e.target.closest("[data-id]");if(!d)return;const c=clients().find(c=>c.id===d.dataset.id);selId=c.id;$("a-client").value=c.name;$("a-list").hidden=true};
+$("btn-add").onclick=()=>{
+  const c=clients().find(c=>c.id===selId),proc=$("a-proc").value.trim(),date=$("a-date").value,time=$("a-time").value;
+  if(!c){$("a-err").textContent="Escolha um cliente da lista.";return}
+  if(!proc||!date||!time){$("a-err").textContent="Informe procedimento, data e horário.";return}
+  const l=apps();l.push({id:Date.now().toString(36),clientId:c.id,client:c.name,phone:c.phone,proc,date,time,value:parseFloat($("a-val").value)||0,status:"agendado"});
+  save(KA(),l);render();closeAll();
+};
+
+/* clientes */
+function renderCli(){
+  const l=clients();
+  $("k-list").innerHTML=l.length?l.map(c=>`<div class="item"><span><b>${esc(c.name)}</b><br><span class="muted">${esc(c.phone)}</span></span><button data-del="${c.id}" aria-label="Remover">✕</button></div>`).join(""):`<p class="muted">Nenhum cliente ainda.</p>`;
+}
+$("fab-cli").onclick=()=>{$("k-err").textContent="";renderCli();openM("m-cli")};
+$("btn-cli").onclick=()=>{
+  const name=$("k-name").value.trim(),phone=$("k-tel").value.trim();
+  if(!name||!phone){$("k-err").textContent="Informe nome e telefone.";return}
+  const l=clients();l.push({id:Date.now().toString(36),name,phone});save(KC(),l);
+  $("k-name").value=$("k-tel").value="";$("k-err").textContent="";renderCli();
+};
+$("k-list").onclick=e=>{const id=e.target.dataset.del;if(!id)return;save(KC(),clients().filter(c=>c.id!==id));renderCli()};
+
+/* status / pagamentos */
+function setStatus(id,st){
+  save(KA(),apps().map(a=>a.id===id?{...a,status:st,paidDate:st==="pago"?today():a.paidDate}:a));
+  render();renderFin();
+}
+$("notes").onclick=e=>{const b=e.target.closest("[data-st]");if(b)return setStatus(b.dataset.id,b.dataset.st);const n=e.target.closest("[data-open]");if(n)showAlert(apps().find(a=>a.id===n.dataset.open))};
+
+/* financeiro */
+function renderFin(){
+  const l=apps(),pago=l.filter(a=>a.status==="pago").sort((a,b)=>(b.paidDate||b.date).localeCompare(a.paidDate||a.date)),pend=l.filter(a=>a.status==="pendente"),ex=load(KE(),[]);
+  $("f-in").textContent=brl(sum(pago));$("f-pe").textContent=brl(sum(pend));$("f-de").textContent=brl(sum(ex));
+  $("f-bal").textContent="Saldo (entrou − despesas): "+brl(sum(pago)-sum(ex));$("pend-total").textContent="Total pendente: "+brl(sum(pend));
+  $("f-hist").innerHTML=pago.length?pago.map(a=>`<div class="item"><span><b>${esc(a.client)}</b><br><span class="muted">${esc(a.proc)} · ${br(a.paidDate||a.date)}</span></span><span class="ok">${brl(a.value||0)}</span></div>`).join(""):`<p class="muted">Nenhum pagamento recebido ainda.</p>`;
+  $("f-pend").innerHTML=pend.length?pend.map(a=>`<div class="item"><span><b>${esc(a.client)}</b><br><span class="muted">${esc(a.proc)} · ${br(a.date)} · ${brl(a.value||0)}</span></span><button class="re" data-st="pago" data-id="${a.id}">Recebi</button></div>`).join(""):`<p class="muted">Nada pendente.</p>`;
+  renderExp(ex);
+}
+$("fab-fin").onclick=()=>{renderFin();openM("m-fin")};
+function renderExp(ex=load(KE(),[])){
+  $("f-exp").innerHTML=ex.length?ex.map(x=>`<div class="item"><span>${esc(x.desc)} <span class="muted">${br(x.date)}</span></span><span>${brl(x.value)} <button data-delx="${x.id}" aria-label="Remover">✕</button></span></div>`).join(""):`<p class="muted">Nenhuma despesa.</p>`;
+}
+$("fab-exp").onclick=()=>{renderExp();openM("m-exp")};
+$("exp-back").onclick=()=>{renderFin();openM("m-fin")};
+$("pend-back").onclick=()=>{renderFin();openM("m-fin")};
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{renderFin();openM(b.dataset.go)});
+$("m-pend").onclick=e=>{const b=e.target.closest("[data-st]");if(b)setStatus(b.dataset.id,b.dataset.st)};
+$("m-exp").onclick=e=>{const x=e.target.dataset.delx;if(x){save(KE(),load(KE(),[]).filter(i=>i.id!==x));renderFin()}};
+$("btn-exp").onclick=()=>{
+  const desc=$("e-desc").value.trim(),value=parseFloat($("e-val").value);
+  if(!desc||!(value>0))return;
+  const ex=load(KE(),[]);ex.unshift({id:Date.now().toString(36),desc,value,date:today()});save(KE(),ex);
+  $("e-desc").value=$("e-val").value="";renderFin();
+};
+$("m-fin").onclick=e=>{
+  const b=e.target.closest("[data-st]");if(b)return setStatus(b.dataset.id,b.dataset.st);
+  const x=e.target.dataset.delx;if(x){save(KE(),load(KE(),[]).filter(i=>i.id!==x));renderFin()}
+};
+
+/* dia do calendário */
+let dayCur=null;
+const ST={agendado:["Agendado","var(--muted)"],pago:["Pago","var(--ok)"],pendente:["Pendente","var(--warn)"],cancelado:["Cancelado","var(--danger)"]};
+function openDay(ds){
+  dayCur=ds;
+  $("d-title").textContent=new Date(ds+"T00:00:00").toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"});
+  const l=apps().filter(a=>a.date===ds).sort((a,b)=>a.time.localeCompare(b.time));
+  $("d-list").innerHTML=l.length?l.map(a=>`<div class="item" data-open="${a.id}" style="cursor:pointer"><span><b>${esc(a.time)} · ${esc(a.client)}</b><br><span class="muted">${esc(a.proc)}${a.value?" · "+brl(a.value):""}</span></span><b style="color:${ST[a.status][1]}">${ST[a.status][0]}</b></div>`).join(""):`<p class="muted">Nenhum agendamento neste dia.</p>`;
+  openM("m-day");
+}
+$("grid").onclick=e=>{const d=e.target.dataset.d;if(d)openDay(d)};
+$("d-list").onclick=e=>{const n=e.target.closest("[data-open]");if(n)showAlert(apps().find(a=>a.id===n.dataset.open))};
+$("btn-dayadd").onclick=()=>{$("fab-add").onclick();$("a-date").value=dayCur};
+
+/* estoque */
+const stock=()=>load(KS(),[]),prods=()=>load(KP(),[]);
+function renderEst(){
+  const s=stock(),p=prods();
+  $("s-items").innerHTML=`<h3>Estoque atual</h3>`+(s.length?s.map(i=>`<div class="item"><span><b>${esc(i.name)}</b><br><span class="muted">${i.qty} un. · ${brl(i.value)} cada</span></span><span>${brl(i.value*i.qty)} <button data-dels="${i.id}" aria-label="Remover">✕</button></span></div>`).join(""):`<p class="muted">Estoque vazio.</p>`);
+  $("p-items").innerHTML=p.length?p.map(i=>`<div class="item"><span>${esc(i.name)}${i.value?` <span class="muted">${brl(i.value)}</span>`:""}</span><button data-delp="${i.id}" aria-label="Remover">✕</button></div>`).join(""):`<p class="muted">Nenhum produto na lista.</p>`;
+}
+function prodList(){
+  const q=$("s-name").value.trim().toLowerCase(),p=prods().filter(i=>i.name.toLowerCase().includes(q));
+  $("s-list").innerHTML=prods().length?(p.length?p.map(i=>`<div data-id="${i.id}">${esc(i.name)}${i.value?` <span class="muted">${brl(i.value)}</span>`:""}</div>`).join(""):`<div class="muted">Nada encontrado na lista</div>`):`<div class="muted">Lista vazia. Cadastre produtos abaixo.</div>`;
+  $("s-list").hidden=false;
+}
+$("fab-est").onclick=()=>{["s-name","s-val","s-qty"].forEach(i=>$(i).value="");$("s-err").textContent="";$("s-list").hidden=true;renderEst();openM("m-est")};
+$("s-name").onfocus=prodList;$("s-name").oninput=prodList;
+$("s-list").onclick=e=>{const d=e.target.closest("[data-id]");if(!d)return;const i=prods().find(i=>i.id===d.dataset.id);$("s-name").value=i.name;if(i.value)$("s-val").value=i.value;$("s-list").hidden=true};
+$("btn-est").onclick=()=>{
+  const name=$("s-name").value.trim(),value=parseFloat($("s-val").value),qty=parseInt($("s-qty").value);
+  if(!name||!(value>=0)||!(qty>0)){$("s-err").textContent="Informe produto, valor e quantidade.";return}
+  const s=stock();s.unshift({id:Date.now().toString(36),name,value,qty});save(KS(),s);
+  const ex=load(KE(),[]);ex.unshift({id:Date.now().toString(36)+"e",desc:"Estoque: "+name+" ("+qty+" x "+brl(value)+")",value:value*qty,date:today()});save(KE(),ex);
+  ["s-name","s-val","s-qty"].forEach(i=>$(i).value="");$("s-err").textContent="";$("s-list").hidden=true;renderEst();
+};
+$("btn-prod").onclick=()=>{
+  const name=$("p-name").value.trim(),value=parseFloat($("p-val").value)||0;if(!name)return;
+  const p=prods();p.push({id:Date.now().toString(36),name,value});p.sort((a,b)=>a.name.localeCompare(b.name));save(KP(),p);
+  $("p-name").value=$("p-val").value="";renderEst();
+};
+$("fab-prod").onclick=()=>{renderEst();openM("m-prod")};
+$("prod-back").onclick=()=>{renderEst();openM("m-est")};
+$("m-prod").onclick=e=>{const p=e.target.dataset.delp;if(p){save(KP(),prods().filter(i=>i.id!==p));renderEst()}};
+$("m-est").onclick=e=>{const s=e.target.dataset.dels,p=e.target.dataset.delp;if(s)save(KS(),stock().filter(i=>i.id!==s));if(p)save(KP(),prods().filter(i=>i.id!==p));if(s||p)renderEst()};
+
+/* alerta de horário */
+function check(){
+  if(!user||!$("ov").hidden)return;
+  const n=new Date(),hm=pad(n.getHours())+":"+pad(n.getMinutes());
+  const a=apps().find(a=>a.date===today()&&a.status==="agendado"&&a.time<=hm&&!seen.has(a.id));
+  if(a)showAlert(a);
+}
+function showAlert(a){
+  if(!a)return;
+  curAlert=a;$("al-time").textContent=a.time;$("al-client").textContent=a.client;
+  $("al-info").textContent=a.proc+(a.value?" · "+brl(a.value):"")+(a.phone?" · "+a.phone:"");
+  $("alert").className="big"+(a.status==="pendente"?" pe":"");
+  $("ov").hidden=false;MODALS.forEach(m=>$(m).hidden=true);$("alert").hidden=false;
+}
+document.querySelectorAll("#alert [data-st]").forEach(b=>b.onclick=()=>{
+  seen.add(curAlert.id);setStatus(curAlert.id,b.dataset.st);closeAll();
+});
+$("al-later").onclick=()=>{seen.add(curAlert.id);closeAll()};
+setInterval(check,20000);
+
+show("login");
+initGoogle();
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
